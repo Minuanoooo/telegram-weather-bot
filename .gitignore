@@ -1,4 +1,4 @@
 venv/
 .env
 weather_bot.db
- __pycache__/
+__pycache__/
