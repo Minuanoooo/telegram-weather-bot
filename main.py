@@ -48,9 +48,7 @@ def telegram_webhook(update: dict, db: Session = Depends(get_db)):
             subscriber.city = city
         db.commit()
         send_message(chat_id, f"Город установлен: {subscriber.city}")
-    else:
-        send_message(chat_id, 'Я пока такого не могу(')
-    if text.startswith('/weather'):
+    elif text.startswith('/weather'):
         subscriber = db.query(Subscribers).filter(Subscribers.chat_id == chat_id).first()
         if not subscriber:
             send_message(chat_id, "Укажите ваш город через /setcity")
@@ -58,6 +56,8 @@ def telegram_webhook(update: dict, db: Session = Depends(get_db)):
             send_message(chat_id,f'Укажите ваш город')
         else:
             send_message(chat_id, get_weather(subscriber.city))
+    else:
+        send_message(chat_id, 'Я пока такого не могу(')
 def send_message(chat_id: int, text: str):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     httpx.post(url, params={"chat_id": chat_id, "text": text})
