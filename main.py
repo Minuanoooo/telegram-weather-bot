@@ -67,17 +67,18 @@ def get_weather(city: str):
     data = get.json()
     print(data)
     temp = data["main"]["temp"]
+    wind = data['wind']['speed']
     description = data["weather"][0]["description"]
     emoji = weather_emojis.get(description, "🌍")
-    weather = f'За окном {round(temp)}°C , {description} {emoji}'
+    weather = f'За окном {round(temp)}°C , скорость ветра {round(wind)} м/с, {description} {emoji}'
     return weather
 def send_daily_weather():
     session = Session()
     daily = session.query(Subscribers).filter(Subscribers.is_active == True).all()
     for t in daily:
-        send_message(t.chat_id, get_weather(t.city))
+        send_message(t.chat_id, f'Доброе утро, за окном {get_weather(t.city)}.')
     session.close()
 @app.on_event("startup")
 def start_scheduler():
-    scheduler.add_job(send_daily_weather, "cron", hour=7, minute=0)
+    scheduler.add_job(send_daily_weather, "cron", hour=7, minute=00)
     scheduler.start()
