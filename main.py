@@ -38,6 +38,22 @@ def telegram_webhook(update: dict, db: Session = Depends(get_db)):
     
     if text is None:
         send_message(chat_id, f'Я пока не могу такого(')
+
+    elif text.startswith("/start"):
+        send_message(chat_id,f'Привет! Я бот погоды.\n\nКоманды:\n/setcity <город> — установить город\n/weather — узнать погоду сейчас\n/stop — отписаться от рассылки')
+
+    elif text.startswith('/stop'):
+        subscriber = db.query(Subscribers).filter(Subscribers.chat_id == chat_id).first()
+        if subscriber:
+            subscriber.is_active = not subscriber.is_active
+            db.commit()
+            if subscriber.is_active:
+                send_message(chat_id, "Подписка включена")
+            else:
+                send_message(chat_id, "Подписка выключена")
+        else:
+            send_message(chat_id,f'Подписчик не найден')
+
     elif text.startswith("/setcity"):
         city = text.split()[-1]
         subscriber = db.query(Subscribers).filter(Subscribers.chat_id == chat_id).first()
@@ -48,6 +64,7 @@ def telegram_webhook(update: dict, db: Session = Depends(get_db)):
             subscriber.city = city
         db.commit()
         send_message(chat_id, f"Город установлен: {subscriber.city}")
+
     elif text.startswith('/weather'):
         subscriber = db.query(Subscribers).filter(Subscribers.chat_id == chat_id).first()
         if not subscriber:
@@ -56,6 +73,7 @@ def telegram_webhook(update: dict, db: Session = Depends(get_db)):
             send_message(chat_id,f'Укажите ваш город')
         else:
             send_message(chat_id, get_weather(subscriber.city))
+
     else:
         send_message(chat_id, 'Я пока такого не могу(')
 def send_message(chat_id: int, text: str):
