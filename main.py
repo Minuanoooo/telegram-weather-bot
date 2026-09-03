@@ -83,6 +83,8 @@ def get_weather(city: str):
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER_TOKEN}&units=metric&lang=ru"
     get = httpx.get(url)
     data = get.json()
+    if data.get("cod") != 200:
+        return "Не удалось найти такой город 😕"
     print(data)
     temp = data["main"]["temp"]
     wind = data['wind']['speed']
