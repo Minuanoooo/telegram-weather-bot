@@ -96,7 +96,7 @@ def send_daily_weather():
     session = Session()
     daily = session.query(Subscribers).filter(Subscribers.is_active == True).all()
     for t in daily:
-        send_message(t.chat_id, f'Доброе утро, за окном {get_weather(t.city)}.')
+        send_message(t.chat_id, f'Доброе утро, {get_weather(t.city)}.')
     session.close()
 @app.on_event("startup")
 def start_scheduler():
